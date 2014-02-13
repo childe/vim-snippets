@@ -197,3 +197,21 @@ snippet epydoc
 
 	@raise e: ${0: Description}
 	"""
+
+snippet initlog
+	import logging
+	import logging.handlers
+
+	LOG_FILENAME = '/var/log/${0:lognam}.log'
+
+	my_logger = logging.getLogger('MyLogger')
+	my_logger.setLevel(logging.DEBUG)
+
+	handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
+												maxBytes=20000000, #20M
+												backupCount=1)
+
+	formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+	handler.setFormatter(formatter)
+
+	my_logger.addHandler(handler)
