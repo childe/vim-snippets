@@ -204,14 +204,33 @@ snippet initlog
 
 	LOG_FILENAME = '/var/log/${0:lognam}.log'
 
-	my_logger = logging.getLogger('MyLogger')
-	my_logger.setLevel(logging.DEBUG)
-
-	handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
-												maxBytes=20000000, #20M
-												backupCount=1)
+	logger = logging.getLogger('MyLogger')
+	logger.setLevel(logging.DEBUG)
 
 	formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-	handler.setFormatter(formatter)
 
-	my_logger.addHandler(handler)
+	file_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
+												maxBytes=20000000, #20M
+												backupCount=1)
+	file_handler.setFormatter(formatter)
+
+	stdout_handler = logging.StreamHandler()
+	stdout_handler.setFormatter(formatter)
+
+	logger.addHandler(file_handler)
+	logger.addHandler(stdout_handler)
+
+
+snippet curpath
+	curpath = os.path.dirname(os.path.abspath(__file__))
+
+snippet py
+	#!/usr/bin/env python
+	# -*- coding: utf-8 -*-
+	def main():
+	    pass   
+	        
+	if __name__ == '__main__':
+	    main()
+snippet #!
+	#!/usr/bin/env python
