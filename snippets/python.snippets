@@ -202,6 +202,7 @@ snippet initlog
 	def initlog():
 		import logging
 		import logging.handlers
+		import sys
 
 		LOG_FILENAME = '%s.log' % __file__[:-3]
 
@@ -216,7 +217,7 @@ snippet initlog
 		file_handler.setFormatter(formatter)
 		file_handler.setLevel(logging.DEBUG)
 
-		stdout_handler = logging.StreamHandler()
+		stdout_handler = logging.StreamHandler(sys.stdout)
 		stdout_handler.setFormatter(formatter)
 		stdout_handler.setLevel(logging.DEBUG)
 
