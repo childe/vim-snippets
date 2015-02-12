@@ -201,50 +201,41 @@ snippet epydoc
 snippet initlog
 	def initlog(level=None):
 		import logging
-		import logging.config
+		import logging.handlers
+		import sys
 		import os
 
+		class MyFormatter(logging.Formatter):
+			def format(self, record):     
+				dformatter = '%(asctime)s - %(levelname)s - %(module)s %(lineno)d - %(message)s'
+				formatter = '%(asctime)s - %(levelname)s - %(message)s'
+				if record.levelno <= logging.DEBUG:
+					self._fmt =  dformatter
+				else:                     
+					self._fmt =  formatter
+				return logging.Formatter.format(self, record)
 		curpath = os.path.dirname(os.path.abspath(__file__))
+		LOG_FILENAME = os.path.join(curpath, '%s.log' % __file__.rsplit('.',1)[0])
 
-		config = {
-			"version": 1,
-			"disable_existing_loggers": True,
-			"formatters": {
-				"simple": {
-					"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-					},
-				"dsimple": {
-					"format": "%(asctime)s - %(levelname)s - %(module)s %(lineno)d - %(message)s"
-					}
-			},
-			"handlers": {
-				"console": {
-					"class": "logging.StreamHandler",
-					"level": "DEBUG",
-					"formatter": "dsimple",
-					"stream": "ext://sys.stdout"
-				},
-				"file_handler": {
-					"class": "logging.handlers.RotatingFileHandler",
-					"level": "DEBUG",
-					"formatter": "simple",
-					"filename": os.path.join(curpath,"%s.log" %
-					__file__.rsplit(
-								'.',
-								1)[0]),
-					"maxBytes": 10*1000**3,  # 10M
-					"backupCount": 5,
-					"encoding": "utf8"}},
-			"loggers": {
-				"myloger": {
-					"level": level or __debug__,
-					"handlers": [
-						"console",
-						"file_handler"],
-					}},
-			}
-		logging.config.dictConfig(config)
-		return logging.getLogger('myloger')
+		logger = logging.getLogger('MyLogger')
+		logger.setLevel(level or __debug__)
+
+		formatter = MyFormatter()
+		stdout_handler = logging.StreamHandler(sys.stdout)
+		stdout_handler.setFormatter(formatter)
+		stdout_handler.setLevel(logging.DEBUG)
+
+		file_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
+													maxBytes=20000000, #20M
+													backupCount=1)
+		file_handler.setFormatter(formatter)
+		file_handler.setLevel(logging.DEBUG)
+
+
+		logger.addHandler(stdout_handler)
+		logger.addHandler(file_handler)
+
+		return logger
 	logger = initlog()
 
 snippet curpath
