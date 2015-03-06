@@ -185,6 +185,8 @@ snippet lc
 	logger.critical(${0:msg})
 snippet li
 	logger.info(${0:msg})
+snippet lld
+	logging.debug(${0:msg})
 snippet epydoc
 	"""
 	${1:Description}
@@ -199,44 +201,70 @@ snippet epydoc
 	"""
 
 snippet initlog
+	import logging
+	import logging.handlers
+	import logging.config
 	def initlog(level=None):
-		import logging
-		import logging.handlers
-		import sys
-		import os
+
+		if level is None:
+			level = logging.DEBUG if __debug__ else logging.INFO
 
 		class MyFormatter(logging.Formatter):
-			def format(self, record):     
-				dformatter = '%(asctime)s - %(levelname)s - %(module)s %(lineno)d - %(message)s'
-				formatter = '%(asctime)s - %(levelname)s - %(message)s'
+			def format(self, record):
+				dformatter = '%(levelname)s: [%(asctime)s] - %(pathname)s %(lineno)d - %(message)s'
+				formatter = '%(levelname)s: [%(asctime)s] - %(message)s'
 				if record.levelno <= logging.DEBUG:
-					self._fmt =  dformatter
-				else:                     
-					self._fmt =  formatter
-				return logging.Formatter.format(self, record)
-		curpath = os.path.dirname(os.path.abspath(__file__))
-		LOG_FILENAME = os.path.join(curpath, '%s.log' % __file__.rsplit('.',1)[0])
+					self._fmt = dformatter
+				else:
+					self._fmt = formatter
+				return super(MyFormatter, self).format(record)
 
-		logger = logging.getLogger('MyLogger')
-		logger.setLevel(level or __debug__)
+		config = {
+			"version": 1,
+			"disable_existing_loggers": True,
+			"formatters": {
+				"custom": {
+					'()': MyFormatter
+				},
+				"simple": {
+					"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+				},
+				"verbose": {
+					"format": "%(asctime)s - %(levelname)s - %(module)s %(lineno)d - %(message)s"
+				}
+			},
+			"handlers": {
+				"console": {
+					"class": "logging.StreamHandler",
+					"level": "DEBUG",
+					"formatter": "custom",
+					"stream": "ext://sys.stdout"
+				},
+				"file_handler": {
+					"class": "logging.handlers.RotatingFileHandler",
+					"level": "DEBUG",
+					"formatter": "custom",
+					"filename": "app.log",
+					"maxBytes": 10*1000**3,  # 10M
+					"backupCount": 5,
+					"encoding": "utf8"
+				}
+			},
+			'root': {
+				'level': level,
+				'handlers': ['console']
+			},
+			"loggers": {
+				"myloger": {
+					"level": level,
+					"handlers": [
+						"file_handler"
+					],
+				}
+			},
+		}
+		logging.config.dictConfig(config)
 
-		formatter = MyFormatter()
-		stdout_handler = logging.StreamHandler(sys.stdout)
-		stdout_handler.setFormatter(formatter)
-		stdout_handler.setLevel(logging.DEBUG)
-
-		file_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
-													maxBytes=20000000, #20M
-													backupCount=1)
-		file_handler.setFormatter(formatter)
-		file_handler.setLevel(logging.DEBUG)
-
-
-		logger.addHandler(stdout_handler)
-		logger.addHandler(file_handler)
-
-		return logger
-	logger = initlog()
 
 snippet curpath
 	curpath = os.path.dirname(os.path.abspath(__file__))
