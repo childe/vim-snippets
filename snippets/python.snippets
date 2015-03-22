@@ -252,13 +252,13 @@ snippet initlog
 			},
 			'root': {
 				'level': level,
-				'handlers': ['console']
+				'handlers': ['file_handler']
 			},
 			"loggers": {
 				"myloger": {
 					"level": level,
 					"handlers": [
-						"file_handler"
+						"console"
 					],
 				}
 			},
