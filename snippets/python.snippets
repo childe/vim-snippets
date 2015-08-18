@@ -187,6 +187,12 @@ snippet li
 	logger.info(${0:msg})
 snippet lld
 	logging.debug(${0:msg})
+snippet lli
+	logging.info(${0:msg})
+snippet llw
+	logging.warn(${0:msg})
+snippet lle
+	logging.error(${0:msg})
 snippet epydoc
 	"""
 	${1:Description}
@@ -201,15 +207,13 @@ snippet epydoc
 	"""
 
 snippet initlog
-	import logging
-	import logging.handlers
-	import logging.config
-	def initlog(level=None):
-
+    import logging
+	def initlog(level=None, log="app.log"):
 		if level is None:
 			level = logging.DEBUG if __debug__ else logging.INFO
 
 		class MyFormatter(logging.Formatter):
+
 			def format(self, record):
 				dformatter = '%(levelname)s: [%(asctime)s] - %(pathname)s %(lineno)d - %(message)s'
 				formatter = '%(levelname)s: [%(asctime)s] - %(message)s'
@@ -244,7 +248,7 @@ snippet initlog
 					"class": "logging.handlers.RotatingFileHandler",
 					"level": "DEBUG",
 					"formatter": "custom",
-					"filename": "app.log",
+					"filename": log,
 					"maxBytes": 10*1000**3,  # 10M
 					"backupCount": 5,
 					"encoding": "utf8"
@@ -253,18 +257,9 @@ snippet initlog
 			'root': {
 				'level': level,
 				'handlers': ['file_handler']
-			},
-			"loggers": {
-				"myloger": {
-					"level": level,
-					"handlers": [
-						"console"
-					],
-				}
-			},
+			}
 		}
 		logging.config.dictConfig(config)
-
 
 snippet curpath
 	curpath = os.path.dirname(os.path.abspath(__file__))
