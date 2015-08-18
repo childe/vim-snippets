@@ -208,6 +208,7 @@ snippet epydoc
 
 snippet initlog
     import logging
+	import logging.config
 	def initlog(level=None, log="app.log"):
 		if level is None:
 			level = logging.DEBUG if __debug__ else logging.INFO
