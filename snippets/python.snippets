@@ -207,9 +207,9 @@ snippet epydoc
 	"""
 
 snippet initlog
-    import logging
+	import logging
 	import logging.config
-	def initlog(level=None, log="app.log"):
+	def initlog(level=None, log="-"):
 		if level is None:
 			level = logging.DEBUG if __debug__ else logging.INFO
 
@@ -260,6 +260,8 @@ snippet initlog
 				'handlers': ['file_handler']
 			}
 		}
+		if log == "-":
+			config["root"]["handlers"] = ["console"]
 		logging.config.dictConfig(config)
 
 snippet curpath
