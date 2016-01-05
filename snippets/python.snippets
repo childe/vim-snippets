@@ -172,11 +172,10 @@ snippet getopt
 # logging
 # glog = get log
 snippet glog
-	import logging
 	logger = logging.getLogger(${0:__name__})
 snippet le
 	logger.error(${0:msg})
-# conflict with lambda=ld, therefor we change into Logger.debuG
+# conflict with lambda=ld, therefor we change into Logger.debug
 snippet lg
 	logger.debug(${0:msg})
 snippet lw
@@ -219,7 +218,7 @@ snippet initlog
 		class MyFormatter(logging.Formatter):
 
 			def format(self, record):
-				dformatter = '[%(asctime)s] %(levelname)s %(name)s %(pathname)s %(lineno)d - %(message)s'
+				dformatter = '[%(asctime)s] %(name)s %(levelname)s %(pathname)s %(lineno)d [%(funcName)s] %(message)s'
 				formatter = '[%(asctime)s] %(levelname)s %(name)s %(message)s'
 				if record.levelno <= logging.DEBUG:
 					self._fmt = dformatter
@@ -235,10 +234,10 @@ snippet initlog
 					'()': MyFormatter
 				},
 				"simple": {
-					"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+					"format": "%(asctime)s %(name)s %(levelname)s %(message)s"
 				},
 				"verbose": {
-					"format": "%(asctime)s - %(levelname)s - %(module)s %(lineno)d - %(message)s"
+					"format": "%(asctime)s %(name)s %(levelname)s %(pathname)s %(lineno)d [%(funcName)s] %(message)s"
 				}
 			},
 			"handlers": {
@@ -278,10 +277,31 @@ snippet curpath
 snippet py
 	#!/usr/bin/env python
 	# -*- coding: utf-8 -*-
+
+	import argparse
+	initlog${0}
+
 	def main():
-	    pass   
+		global logger
+		parser = argparse.ArgumentParser()
+		parser.add_argument( "-l", default="-", help="log file")
+		parser.add_argument("--level", default="info")
+		args = parser.parse_args()
+
+		initlog(level=args.level, log=args.l)
 	        
 	if __name__ == '__main__':
 	    main()
 snippet e
 	enumerate(${0:msg})
+
+# main
+snippet main
+	def main():
+		global logger
+		parser = argparse.ArgumentParser()
+		parser.add_argument( "-l", default="-", help="log file")
+		parser.add_argument("--level", default="info")
+		args = parser.parse_args()
+
+		initlog(level=args.level, log=args.l)
