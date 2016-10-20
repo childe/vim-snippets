@@ -299,7 +299,7 @@ snippet initlog
 			config["handlers"]["file_handler"] = file_handler
 			config["root"]["handlers"] = ["file_handler"]
 		logging.config.dictConfig(config)
-
+	# end initlog
 
 snippet curpath
 	curpath = os.path.dirname(os.path.abspath(__file__))
